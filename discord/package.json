@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "pnpm register_commands && tsx --watch ./main.ts #TODO: compile strict first",
+    "start": "pnpm register_commands && tsx --watch ./main.ts #TODO: compile strict first",
     "register_commands": "tsx ./register_commands.ts"
   },
   "keywords": [],

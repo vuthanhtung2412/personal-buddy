@@ -36,7 +36,7 @@ export async function getAllWorkflows() {
       throw new Error(`Failed to fetch workflows: ${response.statusText}`);
     }
 
-    const result = await response.json();
+    const result = (await response.json()) as { data: Object[] };
     const workflows = result.data as WorkflowData[];
 
     for (const workflow of workflows) {
@@ -47,7 +47,8 @@ export async function getAllWorkflows() {
       const webhookNodes = workflow.nodes.filter(
         (node) => node.name === "Webhook"
       );
-      console.log("Webhook path:", webhookNodes[0].parameters.path);
+      console.log("Webhook path:", webhookNodes[0]?.parameters.path);
+
       console.log("-----");
     }
   } catch (error) {
