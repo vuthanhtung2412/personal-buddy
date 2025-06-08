@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "lib": ["ES2021"],
+    "lib": [
+      "ES2021"
+    ],
     "allowJs": true,
     "checkJs": true,
     "skipLibCheck": true,
@@ -20,9 +22,16 @@
     "sourceMap": true,
     "outDir": "out",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
-  "exclude": ["node_modules"],
-  "include": ["**/*.ts", "**/*.mjs", "./.eslintrc.js"]
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "**/*.ts",
+    "./.eslintrc.js"
+  ]
 }
