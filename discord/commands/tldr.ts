@@ -31,7 +31,13 @@ export async function handler(interaction: Interaction) {
 
   const prompt = makePrompt(getMessageResult.value);
 
-  const { content } = await askAI(prompt);
+  const res = await askAI(prompt);
+  if (res.isErr()) {
+    interaction.editReply(`Error fetching AI response: ${res.error}`);
+    return;
+  }
+  const content = res.value.content;
+
   if (!content) {
     interaction.editReply("Bot have nothing to say")
     return;

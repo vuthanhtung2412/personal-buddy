@@ -24,7 +24,13 @@ export async function handler(interaction: Interaction) {
   await interaction.deferReply();
 
   // const { content } = await askAI(`Can you answer the question below concisely \n---\n ${message}`)
-  const { content } = await askAI(message)
+  const res = await askAI(message)
+  if (res.isErr()) {
+    interaction.editReply(`Error fetching AI response: ${res.error}`);
+    return;
+  }
+  const content = res.value.content;
+
   if (!content) {
     interaction.editReply("Bot have nothing to say")
     return;

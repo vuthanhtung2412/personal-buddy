@@ -1,5 +1,6 @@
 import { AiClient } from "./client";
 import { GetEnv } from "@/config";
+import { Err, Ok } from "@/types/result";
 
 const DEV_MODEL = "llama-3.3-70b-versatile"
 const PROD_MODEL = 'deepseek/deepseek-chat-v3-0324:free'
@@ -19,7 +20,12 @@ export const askAI = async (question: string) => {
       },
     ],
   });
-  return completion.choices[0].message;
+
+  if (!completion.choices[0]?.message) {
+    return new Err("No choices returned from AI");
+  }
+  return new Ok(completion.choices[0]?.message)
+
 }
 
 export const askReasoningAI = async (question: string) => {
@@ -36,5 +42,5 @@ export const askReasoningAI = async (question: string) => {
       },
     ],
   });
-  return completion.choices[0].message;
+  return completion.choices[0]?.message;
 }

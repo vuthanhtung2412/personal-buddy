@@ -4,20 +4,30 @@ import { GetN8NAPIKey } from "@/config";
 interface WorkflowData {
   id: string;
   name: string;
-  active: boolean;
-  nodes: Array<{
-    id: string;
-    name: string;
-    type: string;
-    typeVersion: number;
-    position: [number, number];
-    parameters: Record<string, any>;
-  }>;
-  connections: Record<string, any>;
-  tags: string[];
+  nodes: Array<N8nNode>;
 }
 
+type N8nNode = {
+  id: string;
+  name: string;
+  type: string;
+  typeVersion: number;
+  parameters: Record<string, any>;
+}
+
+type DiscordCommandFromN8n = {
+  inputForm: {
+    name: string;
+    type: 'number' | 'boolean' | 'string'
+  }[]
+  webhookPath: string;
+}
+
+/**
+ * NOT TYPE SAFE
+ */
 export async function getAllWorkflows() {
+  const res: DiscordCommandFromN8n[] = []
   try {
     // Filter active workflows with "discord" tag
     const params = new URLSearchParams({ active: "true", tags: "discord" });
@@ -44,10 +54,69 @@ export async function getAllWorkflows() {
       console.log(`Name: ${workflow.name}`);
 
       // Find webhook nodes
-      const webhookNodes = workflow.nodes.filter(
-        (node) => node.name === "Webhook"
+      let webhookNode = null
+      let workflowTriggerNode = null
+      for (const n of workflow.nodes) {
+        if (n.type === "n8n-nodes-base.webhook") {
+          if (webhookNode) {
+            console.warn(`Multiple webhook nodes found in workflow ${workflow.name}`);
+            continue
+          }
+          webhookNode = n;
+        }
+        if (n.type === "n8n-nodes-base.executeWorkflowTrigger") {
+          if (workflowTriggerNode) {
+            console.warn(`Multiple sub-wf trigger nodes found in workflow ${workflow.name}`);
+            continue
+          }
+          workflowTriggerNode = n;
+        }
+      }
+
+      // log webhook and sub-workflow trigger node details
+      if (webhookNode && 'parameters' in webhookNode) {
+        console.log("Webhook path:", webhookNode?.parameters.path);
+      }
+
+      console.log("Input form", workflowTriggerNode?.
+        parameters.
+        workflowInputs.
+        values
       );
-      console.log("Webhook path:", webhookNodes[0]?.parameters.path);
+
+      // Parse workflow trigger node inputs and webhook path
+      if (!webhookNode?.parameters.path) {
+        console.error(`No webhook node found in workflow ${workflow.name}. Skipped`);
+        continue;
+      }
+      if (!workflowTriggerNode?.parameters.workflowInputs.values) {
+        console.error(`No sub-wf trigger node found in workflow ${workflow.name}. Skipped`);
+        continue;
+      }
+
+      const webhookPath = webhookNode.parameters.path as string;
+      const wfInputs = workflowTriggerNode.parameters.workflowInputs.values;
+
+      const ensureType = (input: {
+        name: string;
+        type?: 'number' | 'boolean' | 'string'
+      }): {
+        name: string;
+        type: 'number' | 'boolean' | 'string'
+      } => ({
+        name: input.name,
+        type: input.type || 'string'
+      })
+
+      const inputForm = (wfInputs as {
+        name: string;
+        type?: 'number' | 'boolean' | 'string'
+      }[]).map(ensureType)
+
+      res.push({
+        webhookPath,
+        inputForm
+      })
 
       console.log("-----");
     }
@@ -55,6 +124,7 @@ export async function getAllWorkflows() {
     console.error("Error fetching workflows:", error);
     throw error;
   }
+  return res
 }
 
 getAllWorkflows();

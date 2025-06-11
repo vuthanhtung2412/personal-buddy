@@ -4,11 +4,13 @@ services:
     container_name: n8n
     environment:
       - N8N_DISABLE_X_FRAME_OPTIONS=true
+      - N8N_LOG_LEVEL=debug
     ports:
       - "5678:5678"
     volumes:
       - ./n8n_data:/home/node/.n8n
     restart: unless-stopped
+    # network_mode: "host"
   qdrant:
     image: qdrant/qdrant:latest
     restart: always

@@ -1,3 +1,4 @@
+// IDK how to classify these type guards
 import { DiscordAPIError } from "discord.js"
 
 export function isDiscordAPIError(err: any): err is DiscordAPIError {
