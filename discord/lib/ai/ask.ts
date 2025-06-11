@@ -1,16 +1,16 @@
 import { AiClient } from "./client";
-import { GetEnv } from "@/config";
+// import { GetEnv } from "@/config";
 import { Err, Ok } from "@/types/result";
 
-const DEV_MODEL = "llama-3.3-70b-versatile"
-const PROD_MODEL = 'deepseek/deepseek-chat-v3-0324:free'
-const PROD_REASONING_MODEL = 'deepseek/deepseek-r1:free'
+const DEV_MODEL = "deepseek-r1-distill-llama-70b"
+// const PROD_MODEL = 'deepseek/deepseek-chat-v3-0324:free'
+// const PROD_REASONING_MODEL = 'deepseek/deepseek-r1:free'
 
 export const askAI = async (question: string) => {
   let model = DEV_MODEL
-  if (GetEnv() == "production") {
-    model = PROD_MODEL
-  }
+  // if (GetEnv() == "production") {
+  //   model = PROD_MODEL
+  // }
   const completion = await AiClient.chat.completions.create({
     model: model,
     messages: [
@@ -30,9 +30,9 @@ export const askAI = async (question: string) => {
 
 export const askReasoningAI = async (question: string) => {
   let model = DEV_MODEL
-  if (GetEnv() == "production") {
-    model = PROD_REASONING_MODEL
-  }
+  // if (GetEnv() == "production") {
+  //   model = PROD_REASONING_MODEL
+  // }
   const completion = await AiClient.chat.completions.create({
     model: model,
     messages: [
