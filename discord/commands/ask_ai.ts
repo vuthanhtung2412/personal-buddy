@@ -23,8 +23,11 @@ export async function handler(interaction: Interaction) {
 
   await interaction.deferReply();
 
-  // const { content } = await askAI(`Can you answer the question below concisely \n---\n ${message}`)
-  const res = await askAI(message)
+  const res = await askAI(
+    `Please answer the question below concisely under 2000 character` +
+    `\n---\n ` +
+    `${message}`)
+
   if (res.isErr()) {
     interaction.editReply(`Error fetching AI response: ${res.error}`);
     return;
