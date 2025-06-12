@@ -1,0 +1,134 @@
+{
+  "name": "hello_world",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "string"
+            },
+            {
+              "name": "num",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -20,
+        0
+      ],
+      "id": "4cc5cae8-6271-4f41-9244-e1ac90d9012d",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nreturn JSON.parse($input.first().json.headers.body);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "69e5a58c-608a-46fb-b1f4-8f0b334d84fd",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "3b9fbff5-8b5e-4bec-b478-14fdf3aa0b5b",
+        "responseMode": "lastNode",
+        "responseData": "allEntries",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -20,
+        180
+      ],
+      "id": "904a6674-4c30-476f-a555-8a7c06fb8248",
+      "name": "Webhook",
+      "webhookId": "3b9fbff5-8b5e-4bec-b478-14fdf3aa0b5b"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfunction removeField(keysToRemove) {\n  return (obj)=> {\n    const rest = { ...obj };\n    keysToRemove.forEach((key) => {\n      delete rest[key]; // Remove the field\n    });\n    return rest;\n\n    return rest; // Return the remaining properties\n  };\n}\n\nreturn {\n  \"hello\" : \"hello\",\n  \"interaction ID\" :$input.first().json.id,\n  \"application ID\" : $input.first().json.applicationId,\n  \"token\": $input.first().json.token,\n  \"options\" : $input.first().json.options.map((o) => removeField([\"type\"])(o))\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        0
+      ],
+      "id": "435219fa-3f9d-4c19-b8ff-3824e069dcc7",
+      "name": "Code1"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "name": "First item",
+          "code": 1
+        }
+      },
+      {
+        "json": {
+          "name": "Second item",
+          "code": 2
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "178b7c81-1af5-4d28-b01c-227d376c747e",
+  "meta": {
+    "instanceId": "351e4f5e261b88af022d366b2d6e69617d96133a4508c5c3dda6e8918d119160"
+  },
+  "id": "9XCklqwdEwCGAeg0",
+  "tags": [
+    {
+      "createdAt": "2025-06-08T13:43:24.526Z",
+      "updatedAt": "2025-06-08T13:43:24.526Z",
+      "id": "t2mC7epjxMUIAhP8",
+      "name": "discord"
+    }
+  ]
+}
