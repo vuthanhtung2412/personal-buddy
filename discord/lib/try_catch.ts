@@ -6,7 +6,6 @@ export async function tryCatch<T, E>(
   typeGuard?: (arg: unknown) => arg is E
 ): Promise<Result<T, E>> {
   try {
-    console.log("Executing promise...");
     const data = await promise;
     return new Ok(data);
   } catch (error) {
