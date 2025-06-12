@@ -104,7 +104,7 @@ export async function getCommandsFromN8n() {
     for (const field of inputForm) {
       switch (field.type) {
         case 'number':
-          data.addNumberOption(option => option
+          data.addIntegerOption(option => option
             .setDescription("None")
             .setName(field.name)
             .setRequired(true)
@@ -150,7 +150,13 @@ function webhookHandler(webhookPath: string) {
         headers: {
           "X-N8N-API-KEY": GetN8NAPIKey(),
           "Content-Type": "application/json",
-          body: JSON.stringify(interaction.toJSON()),
+          body: JSON.stringify({
+            ...interaction.toJSON() as Object,
+            token: interaction.token,
+            options: interaction.options.data
+          }, (_, value) =>
+            typeof value === "bigint" ? value.toString() : value
+          )
         },
       })
     );
@@ -165,13 +171,24 @@ function webhookHandler(webhookPath: string) {
       return
     }
 
-    console.log(res.value)
 
     if (!res.value.ok) {
-      interaction.editReply(`Workflow failed:\n ${res.value.text()}`);
+      const errorMessage = `Workflow failed:\n` +
+        `\`\`\`json\n` +
+        `${JSON.stringify(await res.value.json(), null, 2)}\n` +
+        `\`\`\``
+      console.error("[ERROR] " + errorMessage);
+      interaction.editReply(errorMessage);
       return
     }
 
-    interaction.editReply(`Workflow executed successfully! Output:\n ${res.value.text()}`);
+    const successMessage = `Workflow executed successfully! Output: \n` +
+      `\`\`\`json\n` +
+      `${JSON.stringify(await res.value.json(), null, 2)}\n` +
+      `\`\`\``
+
+    console.log(`[INFO] ` + successMessage);
+
+    interaction.editReply(successMessage);
   };
 }
